@@ -61,7 +61,7 @@
     </div>
 </div>
 
-<!-- APP CONTENT (hidden until login) -->
+<!-- APP CONTENT -->
 <div id="app-content" class="hidden">
 
 <div id="overlay" onclick="closeSidebar()"></div>
@@ -99,10 +99,9 @@
     </main>
 </div>
 
-</div><!-- end app-content -->
+</div>
 
 <script>
-// --- AUTH ---
 function verificarSenha() {
     const input = document.getElementById('senha-input').value;
     const erro = document.getElementById('erro-login');
@@ -117,7 +116,6 @@ function verificarSenha() {
     }
 }
 
-// --- APP ---
 let currentChart = null;
 
 function openSidebar() {
@@ -155,7 +153,12 @@ const skillsData = [
         explanation: "Na nossa carteira, dados de saúde são gerados a cada segundo. O gestor moderno precisa usar ferramentas inteligentes para agrupar esses dados e identificar, por exemplo, que a falta de um programa preventivo de ergonomia em um cliente de call center causará um reajuste de 20% no próximo ciclo por sinistros ortopédicos.",
         pareto: ["Saber cruzar relatórios demográficos básicos com curvas históricas de sinistralidade.", "Configurar e interpretar alertas de anomalias em ferramentas automatizadas de auditoria."],
         blindspot: "Se confiarmos cegamente na IA para analisar o risco técnico, como garantimos que o relacionamento humano e acolhedor não se perca no processo?",
-        related: "analitico"
+        related: "analitico",
+        livros: [
+            { titulo: "Superinteligência", autor: "Nick Bostrom", desc: "Examina o que acontece quando máquinas superam a inteligência humana e como líderes devem se preparar para esse cenário." },
+            { titulo: "A Próxima Onda", autor: "Mustafa Suleyman", desc: "Escrito pelo cofundador do DeepMind, analisa como a IA vai transformar negócios, saúde e sociedade nos próximos anos." },
+            { titulo: "Storytelling com Dados", autor: "Cole Nussbaumer Knaflic", desc: "Ensina a transformar gráficos de sinistros complexos em narrativas visuais que convencem o cliente da necessidade de ações corretivas." }
+        ]
     },
     {
         id: 'analitico', icon: '🔍', name: 'Pensamento Analítico',
@@ -167,7 +170,12 @@ const skillsData = [
         explanation: "O pensamento analítico permite decifrar se o problema de uma conta de saúde é um evento catastrófico isolado ou desvio generalizado de comportamento. Esse é o pilar que sustenta qualquer repactuação técnica de contrato saudável.",
         pareto: ["Identificar a causa raiz de reajustes fora da curva de inflação médica (VCMH).", "Isolar os impactos financeiros de high users na conta geral para repactuações transparentes."],
         blindspot: "Como apresentar análises técnicas extremamente complexas de forma que o RH do cliente realmente entenda e apoie a decisão?",
-        related: "ia"
+        related: "ia",
+        livros: [
+            { titulo: "Rápido e Devagar: Duas Formas de Pensar", autor: "Daniel Kahneman", desc: "Explica como os atalhos mentais distorcem decisões — essencial para evitar erros na análise de reajustes técnicos." },
+            { titulo: "O Sinal e o Ruído", autor: "Nate Silver", desc: "Ensina a separar dados relevantes de ruído estatístico, habilidade crítica para interpretar relatórios de sinistralidade." },
+            { titulo: "Pensamento Crítico", autor: "Tom Chatfield", desc: "Guia prático para estruturar argumentos sólidos e questionar premissas — fundamental em negociações contratuais." }
+        ]
     },
     {
         id: 'lideranca', icon: '🧭', name: 'Liderança e Influência Social',
@@ -179,7 +187,12 @@ const skillsData = [
         explanation: "Para implantar mudanças impopulares, como a coparticipação ou alteração de rede credenciada, a gestora corporativa precisa de altíssima influência social. É preciso engajar os líderes de RH dos clientes para que eles sejam os promotores internos da mudança.",
         pareto: ["Apresentação de resultados com foco em retorno de investimento (ROI) para o RH do cliente.", "Construção de planos de contingência em parceria ativa com o cliente desde o início da vigência."],
         blindspot: "Como exercer influência estratégica no cliente sem parecer que estamos defendendo mais as seguradoras do que a saúde financeira do cliente?",
-        related: "talentos"
+        related: "talentos",
+        livros: [
+            { titulo: "As Armas da Persuasão", autor: "Robert Cialdini", desc: "Os 7 princípios da influência que todo gestor de relacionamento precisa dominar para conduzir negociações complexas." },
+            { titulo: "Coragem para Liderar", autor: "Brené Brown", desc: "Como construir confiança genuína com clientes e equipes através da vulnerabilidade e autenticidade na liderança." },
+            { titulo: "Manual de Persuasão do FBI", autor: "Jack Schafer", desc: "Técnicas reais usadas por agentes federais para construir rapport, ler pessoas e conduzir conversas difíceis." }
+        ]
     },
     {
         id: 'resiliencia', icon: '🎋', name: 'Resiliência, Flexibilidade e Agilidade',
@@ -191,7 +204,12 @@ const skillsData = [
         explanation: "No ecossistema corporativo brasileiro de saúde, as oscilações financeiras e regulatórias são diárias. Equipes flexíveis pivotam o desenho do plano de saúde em poucos dias para salvar uma conta em risco de rescisão.",
         pareto: ["Criar e atualizar planos de contingência de retenção para as 20% contas mais críticas da carteira.", "Saber reagir a crises com relatórios rápidos e propostas estruturadas em menos de 48 horas."],
         blindspot: "Até que ponto estamos confundindo agilidade com desorganização por não anteciparmos os movimentos de desgaste dos contratos?",
-        related: "lideranca"
+        related: "lideranca",
+        livros: [
+            { titulo: "Antifrágil", autor: "Nassim Taleb", desc: "Como construir sistemas que se fortalecem com o caos — o antídoto para equipes que apenas sobrevivem às crises em vez de crescerem com elas." },
+            { titulo: "O Obstáculo é o Caminho", autor: "Ryan Holiday", desc: "Filosofia estoica aplicada aos negócios: como transformar adversidades contratuais em oportunidades de fidelização." },
+            { titulo: "Mindset: A Nova Psicologia do Sucesso", autor: "Carol Dweck", desc: "A diferença entre a mentalidade fixa e a de crescimento — fundamental para equipes que enfrentam metas desafiadoras." }
+        ]
     },
     {
         id: 'criativo', icon: '💡', name: 'Pensamento Criativo',
@@ -203,7 +221,12 @@ const skillsData = [
         explanation: "Gestores que pensam criativamente desenham pacotes de benefícios inovadores que utilizam o mesmo orçamento, porém agregando telessaúde focada, programas de saúde mental ou parcerias preventivas que transformam o plano em retenção de talentos genuína.",
         pareto: ["Desenho de campanhas de engajamento do usuário focadas em prevenção.", "Modelagem de formatos customizados de reajuste técnico (teto de reajuste, bônus por sinistro controlado)."],
         blindspot: "Propostas criativas são ótimas, mas como garantir que elas tenham viabilidade técnica e financeira comprovada?",
-        related: "analitico"
+        related: "analitico",
+        livros: [
+            { titulo: "Uma Mente Criativa", autor: "Ed Catmull", desc: "O cofundador da Pixar revela como criar culturas onde ideias inovadoras sobrevivem à pressão corporativa e ao medo do erro." },
+            { titulo: "Roube como um Artista", autor: "Austin Kleon", desc: "Como combinar referências de outros setores para criar soluções originais em benefícios corporativos." },
+            { titulo: "Sprint", autor: "Jake Knapp", desc: "O método do Google Ventures para resolver grandes problemas e testar novas ideias em apenas cinco dias." }
+        ]
     },
     {
         id: 'aprendizado', icon: '📚', name: 'Curiosidade e Aprendizado Contínuo',
@@ -215,7 +238,12 @@ const skillsData = [
         explanation: "A evolução dos tratamentos de saúde é exponencial. Para fazer a gestão de high users, é preciso entender o ecossistema médico moderno para negociar soluções e segundas opiniões técnicas com segurança.",
         pareto: ["Dedicar tempo semanal para estudar novas coberturas regulamentares brasileiras.", "Compartilhar insights de novas tecnologias de saúde com os RHs parceiros."],
         blindspot: "Estamos estudando tendências globais apenas de forma acadêmica ou estamos aplicando os aprendizados para economizar dinheiro nas contas dos clientes?",
-        related: "tech"
+        related: "tech",
+        livros: [
+            { titulo: "Aprendendo a Aprender", autor: "Barbara Oakley", desc: "Técnicas comprovadas pela neurociência para absorver conhecimentos complexos com mais velocidade e retenção." },
+            { titulo: "O Poder do Hábito", autor: "Charles Duhigg", desc: "Como criar rotinas de aprendizado contínuo que se tornam automáticas, mesmo com a rotina operacional intensa." },
+            { titulo: "Atenção Plena", autor: "Mark Williams", desc: "Como desenvolver foco e presença para absorver informações com mais qualidade em um mundo de distração constante." }
+        ]
     },
     {
         id: 'talentos', icon: '🤝', name: 'Gestão de Talentos',
@@ -227,7 +255,12 @@ const skillsData = [
         explanation: "Líderes de relacionamento precisam calibrar as habilidades técnicas de seus times. O analista precisa saber dialogar de forma comercial, e o executivo de conta precisa compreender as bases de cálculo de margem operacional.",
         pareto: ["Programas de Job Shadowing para aproximar áreas técnicas de áreas comerciais.", "Feedbacks rápidos baseados na satisfação técnica e de atendimento (NPS) dos clientes gerenciados."],
         blindspot: "Como estamos retendo os nossos principais talentos internos para evitar que o cliente sofra com a troca constante do ponto de contato na conta?",
-        related: "lideranca"
+        related: "lideranca",
+        livros: [
+            { titulo: "Trabalho Nenhum", autor: "Jason Fried e David Heinemeier", desc: "Como construir times que entregam mais com menos reuniões, menos ruído e mais autonomia e propósito." },
+            { titulo: "A Regra de Ouro da Liderança", autor: "John C. Maxwell", desc: "Princípios práticos para desenvolver líderes dentro do time e criar uma cultura de alta performance." },
+            { titulo: "Nove Mentiras sobre o Trabalho", autor: "Marcus Buckingham", desc: "Desmonta mitos sobre gestão de pessoas e revela o que realmente engaja e retém talentos nas organizações." }
+        ]
     },
     {
         id: 'tech', icon: '💻', name: 'Literacia Tecnológica',
@@ -239,7 +272,12 @@ const skillsData = [
         explanation: "Os RHs das empresas querem visibilidade e agilidade. A literacia digital permite que seu time ensine os clientes a usarem ferramentas preventivas e aplicativos de orientação de pronto-atendimento virtual, reduzindo o tráfego desnecessário no pronto-socorro.",
         pareto: ["Automatização de disparos de relatórios periódicos de sinistralidade.", "Capacitar o time no uso avançado de painéis dinâmicos de consumo de plano."],
         blindspot: "Será que estamos poluindo o cliente com dezenas de gráficos tecnológicos inúteis em vez de direcionar o painel para a informação que de fato resolve o problema?",
-        related: "ia"
+        related: "ia",
+        livros: [
+            { titulo: "A Startup Enxuta", autor: "Eric Ries", desc: "Como aplicar ciclos rápidos de teste e aprendizado para implementar ferramentas tecnológicas com menos desperdício." },
+            { titulo: "Transformação Digital", autor: "David Rogers", desc: "Guia estratégico para líderes que precisam conduzir a adoção de tecnologia em organizações tradicionais." },
+            { titulo: "Nexus", autor: "Yuval Noah Harari", desc: "Como as redes de informação moldam o poder e os negócios — essencial para entender o mundo tecnológico que seu time precisa navegar." }
+        ]
     },
     {
         id: 'ciber', icon: '🛡️', name: 'Redes e Cibersegurança',
@@ -251,7 +289,12 @@ const skillsData = [
         explanation: "Informação de saúde é o dado mais sensível que existe. Gestores de contas corporativas de benefícios devem ser obcecados com criptografia, compartilhamento seguro de relatórios e canais oficiais blindados de transmissão de dados médicos.",
         pareto: ["Treinamento contínuo sobre diretrizes de compartilhamento de dados sensíveis na carteira.", "Uso obrigatório de plataformas em nuvem seguras para armazenar relatórios de sinistros catastróficos."],
         blindspot: "A equipe entende que cibersegurança é uma atitude diária de proteção de dados ou enxerga as travas de TI apenas como estorvo?",
-        related: "tech"
+        related: "tech",
+        livros: [
+            { titulo: "A Arte de Enganar", autor: "Kevin Mitnick", desc: "O maior hacker da história revela como a engenharia social é a maior ameaça à segurança corporativa — e como se defender." },
+            { titulo: "Crimes do Futuro", autor: "Marc Goodman", desc: "Um panorama assustador e real sobre como criminosos usam tecnologia — essencial para entender os riscos que sua carteira enfrenta." },
+            { titulo: "Privacidade Hackeada", autor: "Carole Cadwalladr", desc: "A história real do escândalo Cambridge Analytica e o que ele revela sobre o valor e o perigo dos dados pessoais no mundo corporativo." }
+        ]
     },
     {
         id: 'ambiental', icon: '🌱', name: 'Gestão Ambiental e ESG',
@@ -263,7 +306,12 @@ const skillsData = [
         explanation: "Em 2030, grandes corporações contratam consultorias que somam às suas agendas ESG. Integrar a saúde ocupacional preventiva ao plano de benefícios mostra governança corporativa transparente e responsabilidade social com as vidas.",
         pareto: ["Criar relatórios de impacto social e saúde para acionistas e comitês corporativos.", "Campanhas digitais de saúde que eliminem resíduos e custos operacionais desnecessários."],
         blindspot: "As suas ações de sustentabilidade agregam valor real ao bem-estar da equipe ou são apenas estratégias de marketing institucional?",
-        related: "resiliencia"
+        related: "resiliencia",
+        livros: [
+            { titulo: "ESG: A Nova Agenda Corporativa", autor: "Ricardo Voltolini", desc: "O guia mais completo em português sobre como implementar práticas ESG de forma genuína e mensurável nas organizações." },
+            { titulo: "Negócios do Futuro", autor: "Rebecca Henderson", desc: "Como empresas líderes estão redesenhando seus modelos de negócio para prosperar num mundo que exige responsabilidade social." },
+            { titulo: "O Mundo que Queremos", autor: "Al Gore", desc: "Uma visão provocadora sobre o papel das corporações na construção de um futuro sustentável — ideal para apresentar ao RH de clientes com agenda ESG." }
+        ]
     }
 ];
 
@@ -458,6 +506,21 @@ function loadSkill(id) {
                     <p class="text-xs text-slate-300 leading-relaxed mb-4">Complemente a capacitação do time conectando esta habilidade com ${related ? related.name : ''}. Ambas formam uma parede sólida contra atritos de reajustes contratuais.</p>
                 </div>
                 ${related ? `<button onclick="loadSkill('${related.id}')" class="w-full text-center bg-emerald-600 hover:bg-emerald-500 px-4 py-2.5 rounded-lg text-xs font-bold transition-all uppercase tracking-wider">Explorar ${related.name}</button>` : ''}
+            </div>
+        </div>
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h3 class="font-serif-title text-xl font-bold mb-2 pb-2 border-b-2 border-slate-200"><span class="text-emerald-600">04.</span> Leitura Recomendada</h3>
+            <p class="text-xs text-slate-500 mb-5">3 livros essenciais para dominar esta habilidade:</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                ${data.livros.map(l => `
+                    <div class="bg-slate-900 p-5 rounded-xl border border-slate-700 flex flex-col">
+                        <div class="mb-3">
+                            <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider block mb-1">Leitura Sugerida</span>
+                            <h4 class="font-serif-title text-base font-bold text-white leading-tight">${l.titulo}</h4>
+                            <p class="text-xs text-slate-400 italic mt-1">${l.autor}</p>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed flex-1">${l.desc}</p>
+                    </div>`).join('')}
             </div>
         </div>
     </div>`;
