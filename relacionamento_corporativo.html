@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habilidades 2030 no Relacionamento Corporativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Merriweather:ital,wght@0,300;0,700;1,300&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .font-serif-title { font-family: 'Merriweather', serif; }
+        .chart-container { position: relative; width: 100%; height: 320px; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #57534e; border-radius: 4px; }
+
+        #sidebar {
+            position: fixed; top: 0; left: -280px; width: 280px; height: 100vh;
+            background: #0f172a; z-index: 200; transition: left 0.3s ease;
+            overflow-y: auto; display: flex; flex-direction: column;
+        }
+        #sidebar.open { left: 0; }
+        #overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); z-index: 199;
+        }
+        #overlay.show { display: block; }
+
+        @media (min-width: 1024px) {
+            #sidebar { position: fixed; left: 0; }
+            #overlay { display: none !important; }
+            #menu-btn { display: none; }
+            #main-wrapper { margin-left: 280px; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<div id="overlay" onclick="closeSidebar()"></div>
+
+<aside id="sidebar">
+    <div class="p-6 border-b border-slate-800 flex items-center justify-between">
+        <div>
+            <h1 class="font-serif-title text-xl text-white tracking-tight mb-1">O Arquiteto</h1>
+            <p class="text-xs text-emerald-400 uppercase tracking-widest font-bold">Gestão & Relacionamento</p>
+        </div>
+        <button onclick="closeSidebar()" class="lg:hidden text-slate-400 hover:text-white text-2xl leading-none">✕</button>
+    </div>
+    <div class="p-4">
+        <p class="text-xs text-slate-500 mb-3 uppercase tracking-wider font-bold">Menu Principal</p>
+        <button onclick="loadOverview(); closeSidebar();" id="btn-overview"
+            class="w-full text-left px-4 py-3 rounded-lg mb-4 bg-emerald-600 text-white font-medium transition-colors text-sm flex items-center gap-2">
+            📊 Visão Geral da Operação
+        </button>
+        <p class="text-xs text-slate-500 mb-2 uppercase tracking-wider font-bold">Desenvolvimento Estratégico</p>
+    </div>
+    <nav class="flex-1 px-4 pb-6 space-y-1" id="skill-nav"></nav>
+</aside>
+
+<div id="main-wrapper">
+    <div class="lg:hidden sticky top-0 z-50 bg-slate-900 px-4 py-3 flex items-center gap-3 shadow-md">
+        <button id="menu-btn" onclick="openSidebar()"
+            class="text-white text-2xl leading-none w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-700 transition-colors">
+            ☰
+        </button>
+        <div>
+            <div class="text-xs text-emerald-400 uppercase tracking-widest font-bold leading-none mb-0.5">O Arquiteto</div>
+            <div class="text-white font-bold text-sm" id="mobile-title">Relacionamento Corporativo</div>
+        </div>
+    </div>
+
+    <main class="min-h-screen">
+        <div class="max-w-5xl mx-auto px-4 py-8 md:px-8 md:py-12 pb-24" id="main-content"></div>
+    </main>
+</div>
+
+<script>
+let currentChart = null;
+
+function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('overlay').classList.add('show');
+}
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+}
+function setMobileTitle(t) {
+    const el = document.getElementById('mobile-title');
+    if (el) el.textContent = t;
+}
+
+const processes = [
+    { id: 'sinistralidade', name: 'Gestão de Sinistralidade', desc: 'Controle de custos vs. receita para viabilidade financeira do plano.', icon: '⚙️', color: 'border-l-emerald-600' },
+    { id: 'consultoria', name: 'Consultoria de Benefícios no RH', desc: 'Apoio estratégico para usar o benefício como atração e bem-estar.', icon: '👤', color: 'border-l-amber-500' },
+    { id: 'expansao', name: 'Expansão de Vidas na Base', desc: 'Identificação de crescimento orgânico e aumento de market share no cliente.', icon: '📈', color: 'border-l-yellow-400' },
+    { id: 'retencao', name: 'Estratégias de Retenção', desc: 'Ações focadas em fidelização para evitar churn e blindar a carteira.', icon: '🛡️', color: 'border-l-stone-400' },
+    { id: 'analise_contratos', name: 'Análise e Repactuação Técnica', desc: 'Ajuste contratual ao perfil real do cliente e auditoria de entregas.', icon: '⚖️', color: 'border-l-orange-500' },
+    { id: 'high_users', name: 'Monitoramento de High Users', desc: 'Acompanhamento de usuários críticos para mitigar riscos financeiros.', icon: '🩺', color: 'border-l-lime-500' },
+    { id: 'coparticipacao', name: 'Implantação de Coparticipação', desc: 'Sensibilização de clientes para incentivar o uso consciente do plano.', icon: '📲', color: 'border-l-teal-600' },
+    { id: 'reajustes', name: 'Negociação de Reajustes Técnicos', desc: 'Aplicação de correções baseadas em dados para sustentar as contas.', icon: '💼', color: 'border-l-green-800' }
+];
+
+const skillsData = [
+    {
+        id: 'ia', icon: '🤖', name: 'IA e Big Data',
+        concept: "Habilidade de aplicar algoritmos preditivos e análise em massa de sinistros para antecipar desvios de custos, identificar gargalos de sinistralidade e automatizar defesas em negociações.",
+        impactBR: 38, impactUS: 45,
+        processesLinked: ['sinistralidade', 'high_users', 'reajustes'],
+        metaphor: "A IA no nosso setor é como um Waze da Saúde. Em vez de descobrir que o contrato bateu 95% de sinistralidade no final do ano, a IA recalcula a rota na primeira curva, alertando que os custos de exames eletivos dispararam 12% em determinada região.",
+        joke: "Tentar controlar sinistralidade usando só tabela dinâmica simples em 2030 é como tentar conter um vazamento de represa usando um chiclete mastigado.",
+        explanation: "Na nossa carteira, dados de saúde são gerados a cada segundo. O gestor moderno precisa usar ferramentas inteligentes para agrupar esses dados e identificar, por exemplo, que a falta de um programa preventivo de ergonomia em um cliente de call center causará um reajuste de 20% no próximo ciclo por sinistros ortopédicos.",
+        pareto: ["Saber cruzar relatórios demográficos básicos com curvas históricas de sinistralidade.", "Configurar e interpretar alertas de anomalias em ferramentas automatizadas de auditoria."],
+        blindspot: "Se confiarmos cegamente na IA para analisar o risco técnico, como garantimos que o relacionamento humano e acolhedor não se perca no processo?",
+        related: "analitico"
+    },
+    {
+        id: 'analitico', icon: '🔍', name: 'Pensamento Analítico',
+        concept: "Capacidade de estruturar relatórios complexos de sinistralidade, isolando fatores críticos (frequência vs. gravidade) para propor correções cirúrgicas de reajustes ou novos modelos de franquias.",
+        impactBR: 40, impactUS: 42,
+        processesLinked: ['sinistralidade', 'analise_contratos', 'reajustes'],
+        metaphor: "Pensar analiticamente é ser um cirurgião do contrato. Um gestor comum diz: 'A sinistralidade está alta'. O gestor analítico diz: 'A sinistralidade geral está em 82%, mas se isolarmos os transplantes, a taxa recorrente é de 68%'.",
+        joke: "Sem análise técnica de dados para falar com o Diretor de RH, a sua proposta de reajuste técnico vira apenas uma briga de gritos onde o cliente sempre grita mais alto.",
+        explanation: "O pensamento analítico permite decifrar se o problema de uma conta de saúde é um evento catastrófico isolado ou desvio generalizado de comportamento. Esse é o pilar que sustenta qualquer repactuação técnica de contrato saudável.",
+        pareto: ["Identificar a causa raiz de reajustes fora da curva de inflação médica (VCMH).", "Isolar os impactos financeiros de high users na conta geral para repactuações transparentes."],
+        blindspot: "Como apresentar análises técnicas extremamente complexas de forma que o RH do cliente realmente entenda e apoie a decisão?",
+        related: "ia"
+    },
+    {
+        id: 'lideranca', icon: '🧭', name: 'Liderança e Influência Social',
+        concept: "Habilidade de atuar como um consultor de confiança junto aos decisores dos clientes, convencendo-os a aprovar coparticipações ou reajustes necessários sem gerar ruptura.",
+        impactBR: 42, impactUS: 35,
+        processesLinked: ['consultoria', 'retencao', 'reajustes'],
+        metaphor: "É a diferença entre o cobrador de impostos e o consultor financeiro. O cobrador só aparece para exigir o reajuste anual. O influenciador estratégico passa o ano inteiro construindo caminhos e soluções de contenção de custos junto ao cliente.",
+        joke: "Se você só liga para o seu cliente na véspera da reunião de reajuste técnico anual, o nome do seu cargo não é Relacionamento, é Anunciador de Más Notícias.",
+        explanation: "Para implantar mudanças impopulares, como a coparticipação ou alteração de rede credenciada, a gestora corporativa precisa de altíssima influência social. É preciso engajar os líderes de RH dos clientes para que eles sejam os promotores internos da mudança.",
+        pareto: ["Apresentação de resultados com foco em retorno de investimento (ROI) para o RH do cliente.", "Construção de planos de contingência em parceria ativa com o cliente desde o início da vigência."],
+        blindspot: "Como exercer influência estratégica no cliente sem parecer que estamos defendendo mais as seguradoras do que a saúde financeira do cliente?",
+        related: "talentos"
+    },
+    {
+        id: 'resiliencia', icon: '🎋', name: 'Resiliência, Flexibilidade e Agilidade',
+        concept: "Habilidade de lidar com ameaças inesperadas de churn, responder rapidamente a sinistros catastróficos e adaptar o desenho do benefício conforme regras e novas resoluções do mercado brasileiro.",
+        impactBR: 45, impactUS: 30,
+        processesLinked: ['retencao', 'sinistralidade', 'analise_contratos'],
+        metaphor: "É o airbag do carro. Você não o ativa voluntariamente, mas quando a colisão — uma ameaça iminente de concorrência ou reajuste severo — acontece, ele absorve o impacto em milissegundos para salvar a conta.",
+        joke: "Se o seu plano estratégico para manter uma conta expira no primeiro concorrente que bate na porta oferecendo 10% de desconto fictício, seu relacionamento corporativo é feito de vidro.",
+        explanation: "No ecossistema corporativo brasileiro de saúde, as oscilações financeiras e regulatórias são diárias. Equipes flexíveis pivotam o desenho do plano de saúde em poucos dias para salvar uma conta em risco de rescisão.",
+        pareto: ["Criar e atualizar planos de contingência de retenção para as 20% contas mais críticas da carteira.", "Saber reagir a crises com relatórios rápidos e propostas estruturadas em menos de 48 horas."],
+        blindspot: "Até que ponto estamos confundindo agilidade com desorganização por não anteciparmos os movimentos de desgaste dos contratos?",
+        related: "lideranca"
+    },
+    {
+        id: 'criativo', icon: '💡', name: 'Pensamento Criativo',
+        concept: "Habilidade de propor intervenções disruptivas na utilização de planos de saúde, campanhas envolventes de promoção de hábitos saudáveis e negociações ganha-ganha de contratos de benefícios.",
+        impactBR: 30, impactUS: 28,
+        processesLinked: ['consultoria', 'coparticipacao', 'expansao'],
+        metaphor: "É a diferença entre dar um folheto sem graça contra a hipertensão e desenhar uma gamificação de passos na empresa do cliente que reduz a taxa de sinistro por infarto agudo em 15%. É sobre ver soluções onde outros só enxergam planilhas.",
+        joke: "Achar que a única forma de conter sinistralidade é aumentando a coparticipação do funcionário é demonstrar a criatividade de um tijolo em termos de gestão de benefícios.",
+        explanation: "Gestores que pensam criativamente desenham pacotes de benefícios inovadores que utilizam o mesmo orçamento, porém agregando telessaúde focada, programas de saúde mental ou parcerias preventivas que transformam o plano em retenção de talentos genuína.",
+        pareto: ["Desenho de campanhas de engajamento do usuário focadas em prevenção.", "Modelagem de formatos customizados de reajuste técnico (teto de reajuste, bônus por sinistro controlado)."],
+        blindspot: "Propostas criativas são ótimas, mas como garantir que elas tenham viabilidade técnica e financeira comprovada?",
+        related: "analitico"
+    },
+    {
+        id: 'aprendizado', icon: '📚', name: 'Curiosidade e Aprendizado Contínuo',
+        concept: "Manter-se constantemente atualizada sobre soluções tecnológicas de saúde, novos medicamentos de alto custo e mudanças tributárias e trabalhistas na contratação de benefícios.",
+        impactBR: 35, impactUS: 38,
+        processesLinked: ['high_users', 'consultoria', 'analise_contratos'],
+        metaphor: "Imagine a medicina e as terapias de alto custo como um trem-bala. Se você ficar na plataforma lendo manuais de benefícios de 2018, quando olhar de volta, o mercado e as demandas dos clientes já estarão em outra cidade.",
+        joke: "Se sua equipe ainda treme de medo ao ouvir falar de terapias gênicas ou drogas biológicas porque não compreende esses termos, você está gerindo contas de hoje com a mente do século passado.",
+        explanation: "A evolução dos tratamentos de saúde é exponencial. Para fazer a gestão de high users, é preciso entender o ecossistema médico moderno para negociar soluções e segundas opiniões técnicas com segurança.",
+        pareto: ["Dedicar tempo semanal para estudar novas coberturas regulamentares brasileiras.", "Compartilhar insights de novas tecnologias de saúde com os RHs parceiros."],
+        blindspot: "Estamos estudando tendências globais apenas de forma acadêmica ou estamos aplicando os aprendizados para economizar dinheiro nas contas dos clientes?",
+        related: "tech"
+    },
+    {
+        id: 'talentos', icon: '🤝', name: 'Gestão de Talentos',
+        concept: "Habilidade de estruturar equipes de relacionamento corporativo com perfis híbridos: analistas numéricos focados em sinistralidade combinados com executivos de excelente traquejo político.",
+        impactBR: 28, impactUS: 40,
+        processesLinked: ['consultoria', 'retencao', 'reajustes'],
+        metaphor: "É como montar a orquestra sinfônica da sua área de benefícios. O violoncelo (analista de dados) precisa estar em perfeita sintonia com o trompete (gerente de relacionamento) para o cliente não ouvir apenas barulho.",
+        joke: "Contratar apenas pessoas simpáticas para o Relacionamento Corporativo e esperar que elas consigam defender uma planilha complexa de sinistros no cliente é receita certa para sofrer um churn traumático.",
+        explanation: "Líderes de relacionamento precisam calibrar as habilidades técnicas de seus times. O analista precisa saber dialogar de forma comercial, e o executivo de conta precisa compreender as bases de cálculo de margem operacional.",
+        pareto: ["Programas de Job Shadowing para aproximar áreas técnicas de áreas comerciais.", "Feedbacks rápidos baseados na satisfação técnica e de atendimento (NPS) dos clientes gerenciados."],
+        blindspot: "Como estamos retendo os nossos principais talentos internos para evitar que o cliente sofra com a troca constante do ponto de contato na conta?",
+        related: "lideranca"
+    },
+    {
+        id: 'tech', icon: '💻', name: 'Literacia Tecnológica',
+        concept: "Domínio prático e estratégico das plataformas de BI, CRMs de relacionamento e ferramentas de telemedicina para gerar transparência absoluta e eficiência ao cliente.",
+        impactBR: 32, impactUS: 42,
+        processesLinked: ['sinistralidade', 'high_users', 'coparticipacao'],
+        metaphor: "Substituir planilhas impressas e estáticas por painéis de controle digitais e interativos, dando ao cliente a autonomia de ver onde os recursos de saúde estão sendo gastos em tempo real.",
+        joke: "Apresentar slides estáticos de PDF do consumo médico trimestral em 2030 faz sua consultoria de benefícios parecer um museu arqueológico no meio do Vale do Silício.",
+        explanation: "Os RHs das empresas querem visibilidade e agilidade. A literacia digital permite que seu time ensine os clientes a usarem ferramentas preventivas e aplicativos de orientação de pronto-atendimento virtual, reduzindo o tráfego desnecessário no pronto-socorro.",
+        pareto: ["Automatização de disparos de relatórios periódicos de sinistralidade.", "Capacitar o time no uso avançado de painéis dinâmicos de consumo de plano."],
+        blindspot: "Será que estamos poluindo o cliente com dezenas de gráficos tecnológicos inúteis em vez de direcionar o painel para a informação que de fato resolve o problema?",
+        related: "ia"
+    },
+    {
+        id: 'ciber', icon: '🛡️', name: 'Redes e Cibersegurança',
+        concept: "Conformidade absoluta com leis de dados como a LGPD ao manusear atestados, prontuários de usuários críticos e históricos de sinistros no relacionamento corporativo.",
+        impactBR: 25, impactUS: 45,
+        processesLinked: ['high_users', 'analise_contratos'],
+        metaphor: "É a blindagem de sigilo médico do seu ecossistema. Um único vazamento de dados de saúde de colaboradores de um cliente grande não destrói apenas um contrato — destrói a reputação de anos do seu negócio.",
+        joke: "Enviar lista de high users em anexo aberto por e-mail com a senha 123 é pedir licença para receber um processo milionário da LGPD e uma demissão por justa causa.",
+        explanation: "Informação de saúde é o dado mais sensível que existe. Gestores de contas corporativas de benefícios devem ser obcecados com criptografia, compartilhamento seguro de relatórios e canais oficiais blindados de transmissão de dados médicos.",
+        pareto: ["Treinamento contínuo sobre diretrizes de compartilhamento de dados sensíveis na carteira.", "Uso obrigatório de plataformas em nuvem seguras para armazenar relatórios de sinistros catastróficos."],
+        blindspot: "A equipe entende que cibersegurança é uma atitude diária de proteção de dados ou enxerga as travas de TI apenas como estorvo?",
+        related: "tech"
+    },
+    {
+        id: 'ambiental', icon: '🌱', name: 'Gestão Ambiental e ESG',
+        concept: "Conexão dos pacotes de benefícios com o pilar Social e de Governança das metas ESG do cliente corporativo, engajando os planos em iniciativas de bem-estar sustentável.",
+        impactBR: 20, impactUS: 22,
+        processesLinked: ['consultoria', 'expansao'],
+        metaphor: "A saúde física e mental dos funcionários é o ecossistema humano interno da empresa. Cuidar de sinistralidade preventiva e oferecer saúde integral é manter esse ecossistema oxigenado e saudável para os próximos anos.",
+        joke: "Querer falar de sustentabilidade corporativa com o cliente enquanto as ações de prevenção da sua equipe consistem basicamente em pilhas de copos plásticos e café açucarado é uma contradição difícil de esconder.",
+        explanation: "Em 2030, grandes corporações contratam consultorias que somam às suas agendas ESG. Integrar a saúde ocupacional preventiva ao plano de benefícios mostra governança corporativa transparente e responsabilidade social com as vidas.",
+        pareto: ["Criar relatórios de impacto social e saúde para acionistas e comitês corporativos.", "Campanhas digitais de saúde que eliminem resíduos e custos operacionais desnecessários."],
+        blindspot: "As suas ações de sustentabilidade agregam valor real ao bem-estar da equipe ou são apenas estratégias de marketing institucional?",
+        related: "resiliencia"
+    }
+];
+
+function init() {
+    renderSidebar();
+    loadOverview();
+}
+
+function renderSidebar() {
+    const nav = document.getElementById('skill-nav');
+    skillsData.forEach(skill => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-left px-4 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-3';
+        btn.innerHTML = `<span class="text-lg">${skill.icon}</span><span class="truncate">${skill.name}</span>`;
+        btn.onclick = () => { loadSkill(skill.id); closeSidebar(); };
+        nav.appendChild(btn);
+    });
+}
+
+function setActiveButton(id) {
+    document.querySelectorAll('aside button').forEach(b => {
+        b.classList.remove('bg-emerald-600', 'text-white', 'bg-slate-800');
+        b.classList.add('text-slate-400');
+    });
+    if (id === 'overview') {
+        const btn = document.getElementById('btn-overview');
+        btn.classList.add('bg-emerald-600', 'text-white');
+        btn.classList.remove('text-slate-400');
+    } else {
+        document.querySelectorAll('#skill-nav button').forEach(b => {
+            if (b.onclick && b.onclick.toString().includes(`'${id}'`)) {
+                b.classList.add('bg-slate-800', 'text-white');
+                b.classList.remove('text-slate-400');
+            }
+        });
+    }
+}
+
+function loadOverview() {
+    setActiveButton('overview');
+    setMobileTitle('Visão Geral');
+    const content = document.getElementById('main-content');
+
+    content.innerHTML = `
+    <div class="fade-in space-y-8">
+        <div>
+            <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest block mb-1">O Arquiteto apresenta:</span>
+            <h2 class="font-serif-title text-3xl sm:text-4xl text-slate-900 font-bold leading-tight">Mapeamento de Habilidades Operacionais</h2>
+            <p class="text-slate-500 text-sm sm:text-base mt-2">Como as competências em alta conectam-se diretamente com os 8 pilares do Relacionamento Corporativo.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-emerald-600">
+            <h3 class="font-serif-title text-xl text-slate-900 font-bold mb-2">Construindo Conhecimento na Prática</h3>
+            <p class="text-slate-600 leading-relaxed text-sm sm:text-base">
+                Olá! Sou O Arquiteto. Unindo o entendimento operacional do seu dia a dia aos cenários de alta de competências corporativas, adaptamos este ambiente.
+                Abaixo você verá a Matriz de Operações. Cada processo do seu setor está mapeado.
+                Escolha um processo para descobrir quais habilidades são indispensáveis para turbinar o seu desempenho e evitar perdas financeiras em contratos de saúde.
+            </p>
+        </div>
+
+        <div>
+            <h3 class="font-serif-title text-xl text-slate-900 font-bold mb-4">Selecione uma Operação de sua Carteira:</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                ${processes.map(p => `
+                    <div onclick="highlightRelatedSkills('${p.id}', '${p.name}')"
+                        class="bg-white p-5 rounded-xl border border-slate-200 border-l-4 ${p.color} hover:shadow-md transition-all cursor-pointer">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xl">${p.icon}</span>
+                            <h4 class="font-bold text-slate-800 text-sm leading-tight">${p.name}</h4>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-3">${p.desc}</p>
+                        <span class="text-xs text-emerald-600 font-bold tracking-wider uppercase">Ver Habilidades →</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <div id="process-mapping-result" class="hidden bg-slate-900 text-white p-6 rounded-xl shadow-lg border border-slate-800"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-800 mb-1 font-serif-title">Priorização de Habilidades — Brasil vs. EUA</h3>
+                <p class="text-xs text-slate-500 mb-4">Comparativo de prioridade de capacitação para times técnicos de benefícios.</p>
+                <div class="chart-container"><canvas id="radarOverview"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2 font-serif-title">Por que as duas geografias diferem?</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        Nos EUA, as regras de privacidade (HIPAA) exigem altíssima Cibersegurança e literacia tecnológica no cruzamento de dados de high users.
+                        Já no Brasil, a alta volatilidade da economia e os reajustes técnicos intensamente debatidos exigem níveis recordes de Resiliência, Flexibilidade e Agilidade,
+                        além de excelente Liderança e Influência Social para repactuar contratos sem perder a conta.
+                    </p>
+                </div>
+                <div class="bg-slate-100 p-4 rounded-xl border-l-4 border-l-slate-600">
+                    <span class="text-xs text-slate-500 block uppercase font-bold">Conselho do Arquiteto</span>
+                    <p class="text-xs text-slate-700 italic mt-1">"Capacite suas gestoras para serem tradutoras de métricas atuariais complexas em planos de ação de bem-estar corporativo para o cliente."</p>
+                </div>
+            </div>
+        </div>
+    </div>`;
+
+    setTimeout(renderOverviewChart, 100);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function highlightRelatedSkills(processId, processName) {
+    const container = document.getElementById('process-mapping-result');
+    container.classList.remove('hidden');
+    container.classList.add('fade-in');
+
+    const linkedSkills = skillsData.filter(s => s.processesLinked.includes(processId));
+
+    const skillsHtml = linkedSkills.length
+        ? linkedSkills.map(s => `
+            <div onclick="loadSkill('${s.id}')"
+                class="bg-slate-800 p-4 rounded-lg hover:bg-slate-700 cursor-pointer transition-colors border border-slate-700 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl">${s.icon}</span>
+                    <div>
+                        <span class="font-bold text-sm block hover:text-emerald-400">${s.name}</span>
+                        <span class="text-xs text-slate-400">Clique para ver o plano de ensino</span>
+                    </div>
+                </div>
+                <span class="text-xs text-emerald-400 font-bold">→</span>
+            </div>`).join('')
+        : `<p class="text-xs text-slate-400 italic">Acesse o menu lateral para conferir todos os planos de aprendizado.</p>`;
+
+    container.innerHTML = `
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 pb-4 border-b border-slate-800 gap-2">
+            <div>
+                <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Ações de Desenvolvimento</span>
+                <h4 class="font-serif-title text-xl font-bold">${processName}</h4>
+            </div>
+            <button onclick="document.getElementById('process-mapping-result').classList.add('hidden')"
+                class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1 rounded">Fechar</button>
+        </div>
+        <p class="text-sm text-slate-300 mb-4">Para elevar a performance técnica deste pilar, desenvolva prioritariamente estas competências:</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">${skillsHtml}</div>`;
+
+    container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function loadSkill(id) {
+    setActiveButton(id);
+    const data = skillsData.find(s => s.id === id);
+    const related = skillsData.find(s => s.id === data.related);
+    const relatedProcesses = processes.filter(p => data.processesLinked.includes(p.id));
+    setMobileTitle(data.name);
+
+    const content = document.getElementById('main-content');
+    content.innerHTML = `
+    <div class="fade-in space-y-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest block">Capacitação em Foco</span>
+                <h2 class="font-serif-title text-3xl sm:text-4xl text-slate-900 font-bold mt-1 flex items-center gap-3 flex-wrap">
+                    <span>${data.icon}</span><span>${data.name}</span>
+                </h2>
+            </div>
+            <button onclick="loadOverview()"
+                class="text-xs font-bold text-slate-500 bg-slate-200 hover:bg-slate-300 px-3 py-2 rounded-lg transition-colors">
+                ← Voltar ao Painel
+            </button>
+        </div>
+
+        <div class="flex flex-wrap gap-2 items-center bg-slate-100 p-3 rounded-xl border border-slate-200">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider mr-2">Transforma estes processos:</span>
+            ${relatedProcesses.map(p => `
+                <span class="text-xs font-bold bg-white text-slate-700 border border-slate-300 px-2.5 py-1 rounded-full flex items-center gap-1">
+                    ${p.icon} ${p.name}
+                </span>`).join('')}
+        </div>
+
+        <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-6 sm:p-8 rounded-2xl shadow-lg relative overflow-hidden">
+            <div class="relative z-10">
+                <h3 class="text-emerald-400 uppercase tracking-widest font-bold text-xs mb-2">Conceito Aplicado ao Setor</h3>
+                <p class="text-lg sm:text-2xl font-serif-title leading-snug">"${data.concept}"</p>
+            </div>
+            <div class="absolute right-[-20px] bottom-[-20px] text-white opacity-5 text-9xl">${data.icon}</div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-slate-900 p-5 rounded-2xl text-white">
+                <h4 class="text-emerald-400 font-bold uppercase tracking-wider text-xs mb-3">Impacto Estimado na Retenção de Contratos</h4>
+                <div class="chart-container" style="height:200px;"><canvas id="skillImpactChart"></canvas></div>
+            </div>
+            <div class="bg-amber-50 border border-amber-200 p-5 rounded-2xl flex flex-col justify-center">
+                <span class="text-xs text-amber-700 font-bold uppercase tracking-wider block mb-2">Ponto Cego</span>
+                <p class="text-base text-amber-950 font-serif-title italic">"${data.blindspot}"</p>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h3 class="font-serif-title text-xl font-bold mb-4 pb-2 border-b-2 border-slate-200">
+                <span class="text-emerald-600">01.</span> Entendendo Facilmente
+            </h3>
+            <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-5"><strong>A Metáfora:</strong> ${data.metaphor}</p>
+            <div class="bg-slate-50 border-l-4 border-slate-800 p-4 sm:p-5 rounded text-slate-700 italic text-sm sm:text-base">"${data.joke}"</div>
+        </div>
+
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h3 class="font-serif-title text-xl font-bold mb-4 pb-2 border-b-2 border-slate-200">
+                <span class="text-emerald-600">02.</span> Explicação
+            </h3>
+            <p class="text-slate-700 text-sm sm:text-base leading-relaxed">${data.explanation}</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-emerald-600">
+                <h3 class="font-serif-title text-lg font-bold mb-1 text-slate-800">03. A Regra 80/20</h3>
+                <p class="text-xs text-slate-500 mb-4">Desenvolva estes 20% para colher 80% do resultado:</p>
+                <ul class="space-y-3 text-slate-800">
+                    ${data.pareto.map(item => `
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-emerald-600 font-bold mt-0.5">✔</span>
+                            <span>${item}</span>
+                        </li>`).join('')}
+                </ul>
+            </div>
+            <div class="bg-slate-900 text-white p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                    <h3 class="font-serif-title text-lg font-bold mb-3 text-emerald-400">05. Assunto Relacionado</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                        Complemente a capacitação do time conectando esta habilidade com ${related ? related.name : ''}. Ambas formam uma parede sólida contra atritos de reajustes contratuais.
+                    </p>
+                </div>
+                ${related ? `
+                <button onclick="loadSkill('${related.id}')"
+                    class="w-full text-center bg-emerald-600 hover:bg-emerald-500 px-4 py-2.5 rounded-lg text-xs font-bold transition-all uppercase tracking-wider">
+                    Explorar ${related.name}
+                </button>` : ''}
+            </div>
+        </div>
+    </div>`;
+
+    setTimeout(() => renderSkillChart(data.impactBR, data.impactUS), 100);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderOverviewChart() {
+    if (currentChart) currentChart.destroy();
+    const ctx = document.getElementById('radarOverview').getContext('2d');
+    currentChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: skillsData.map(s => s.name.length > 15 ? s.name.substr(0, 15) + '...' : s.name),
+            datasets: [
+                { label: 'Urgência Brasil', data: [9, 9.5, 9, 8, 9.5, 8.5, 9, 8, 7.5, 7], backgroundColor: 'rgba(16,185,129,0.2)', borderColor: 'rgba(16,185,129,1)', borderWidth: 2 },
+                { label: 'Urgência EUA', data: [9.5, 9, 8.5, 8.5, 8, 9, 8.5, 9, 9, 7.5], backgroundColor: 'rgba(59,130,246,0.2)', borderColor: 'rgba(59,130,246,1)', borderWidth: 2 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: { r: { angleLines: { display: true, color: '#e2e8f0' }, grid: { color: '#e2e8f0' }, ticks: { display: false }, pointLabels: { font: { size: window.innerWidth < 768 ? 8 : 9 }, color: '#475569' } } },
+            plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }
+        }
+    });
+}
+
+function renderSkillChart(br, us) {
+    if (currentChart) currentChart.destroy();
+    const ctx = document.getElementById('skillImpactChart').getContext('2d');
+    currentChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Potencial de Retenção %'],
+            datasets: [
+                { label: 'Brasil', data: [br], backgroundColor: '#10b981', borderRadius: 6 },
+                { label: 'EUA', data: [us], backgroundColor: '#3b82f6', borderRadius: 6 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#94a3b8' }, max: 50 },
+                y: { ticks: { display: false } }
+            },
+            plugins: { legend: { position: 'top', labels: { color: '#f1f5f9', font: { size: 11 } } } }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
